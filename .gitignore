@@ -12,3 +12,5 @@ Resultados_OCR/*
 pyvenv.cfg
 path.py
 __pycache__
+/Modulos/tab_result.py
+processa_imagens.sh
