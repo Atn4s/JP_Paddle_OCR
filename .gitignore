@@ -7,10 +7,10 @@ Matriz_Confusao/*
 Resultados_OCR/*
 /share
 /2-PaddleGUI_JSON_stable.py
-/imagem1.json
-/imagem2.json
+/validacao_manual
 pyvenv.cfg
 path.py
 __pycache__
 /Modulos/tab_result.py
 processa_imagens.sh
+/saida_processada
