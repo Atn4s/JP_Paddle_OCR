@@ -40,9 +40,15 @@ def process_image(img_path):
 
         draw.rectangle([top_left, bottom_right], outline=color, width=3)
 
-        bbox = config.font.getbbox(text)
+        # Define dinamicamente o tamanho da fonte com base na altura da caixa
+        box_height = bottom_right[1] - top_left[1]
+        font_size = max(10, int(box_height * 0.5))  # 50% da altura da caixa
+        font = config.get_font(size=font_size)
+
+        bbox = font.getbbox(text)
         text_width = bbox[2] - bbox[0]
         text_height = bbox[3] - bbox[1]
+
 
         text_x = top_left[0]
         text_y = top_left[1] - text_height - 2
@@ -62,10 +68,10 @@ def process_image(img_path):
         # Contorno preto
         for dx in [-1, 1]:
             for dy in [-1, 1]:
-                draw.text((text_x + dx, text_y + dy), text, font=config.font, fill=(0, 0, 0))
+                draw.text((text_x + dx, text_y + dy), text, font=font, fill=(0, 0, 0))
 
         # Texto principal branco
-        draw.text((text_x, text_y), text, font=config.font, fill=(255, 255, 255))
+        draw.text((text_x, text_y), text, font=font, fill=(255, 255, 255))
 
         texto_bruto += f"OCR='{text}', score={score:.2f}, bbox=[{x0},{y0},{x1},{y1}]\n"
 
@@ -79,7 +85,7 @@ def process_image(img_path):
     lx, ly = 20, img_pil.height - 100
 
     for i, (legenda, cor) in enumerate(legenda_textos):
-        draw.text((lx, ly + i * 30), legenda, fill=cor, font=config.font)
+        draw.text((lx, ly + i * 30), legenda, fill=cor, font=font)
 
     # === Salva texto extraído ===
     txt_filename = os.path.join(path.resultados, f"{name_no_ext}_ocr.txt")

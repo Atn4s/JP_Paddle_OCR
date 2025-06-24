@@ -10,6 +10,14 @@ except:
     print("Erro ao carregar a fonte personalizada, usando fonte padrão.")
     font = ImageFont.load_default()
 
+
+def get_font(size=40):
+    try:
+        return ImageFont.truetype(font_path, size=size)
+    except:
+        print("Erro ao carregar a fonte personalizada, usando fonte padrão.")
+        return ImageFont.load_default()
+
 # === Define cores de acordo com o metodo de validaçãom ocr_mode interno, json validação externa ===
 mode = "ocr_mode"  # Pode ser "json" ou "ocr_mode"
 

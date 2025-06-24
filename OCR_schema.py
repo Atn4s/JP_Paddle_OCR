@@ -282,14 +282,25 @@ class OCRProcessor:
             print(f"Erro ao processar arquivo: {e}")
 
 def main():
-    parser = argparse.ArgumentParser(description='Processa saída do PaddleOCR para estrutura de nota fiscal')
-    parser.add_argument('input_file', help='Arquivo de entrada (.txt) com saída do PaddleOCR')
-    parser.add_argument('-o', '--output', help='Nome do arquivo de saída (opcional)')
+    parser = argparse.ArgumentParser(description='Processa todos os arquivos .txt da pasta Resultados_OCR')
+    parser.add_argument('-i', '--input_dir', default='Resultados_OCR', help='Diretório de entrada com arquivos .txt')
+    parser.add_argument('-o', '--output_dir', default='saida_processada', help='Diretório de saída dos arquivos JSON')
     
     args = parser.parse_args()
     
+    input_dir = args.input_dir
+    output_dir = args.output_dir
+    
     processor = OCRProcessor()
-    processor.process_file(args.input_file, args.output)
+    processor.output_dir = output_dir  # Garante que use o output informado
+    processor.ensure_output_dir()
+    
+    # Itera por todos os arquivos .txt no diretório
+    for filename in os.listdir(input_dir):
+        if filename.lower().endswith('.txt'):
+            input_path = os.path.join(input_dir, filename)
+            output_name = f"{os.path.splitext(filename)[0]}_processado.json"
+            processor.process_file(input_path, output_name)
 
 if __name__ == "__main__":
     main()
