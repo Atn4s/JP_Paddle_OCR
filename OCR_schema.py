@@ -7,7 +7,7 @@ import argparse
 
 class OCRProcessor:
     def __init__(self):
-        self.output_dir = "saida_processada"
+        self.output_dir = "Saida_Processada"
         self.ensure_output_dir()
         
     def ensure_output_dir(self):
@@ -284,7 +284,7 @@ class OCRProcessor:
 def main():
     parser = argparse.ArgumentParser(description='Processa todos os arquivos .txt da pasta Resultados_OCR')
     parser.add_argument('-i', '--input_dir', default='Resultados_OCR', help='Diretório de entrada com arquivos .txt')
-    parser.add_argument('-o', '--output_dir', default='saida_processada', help='Diretório de saída dos arquivos JSON')
+    parser.add_argument('-o', '--output_dir', default='Saida_Processada', help='Diretório de saída dos arquivos JSON')
     
     args = parser.parse_args()
     

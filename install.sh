@@ -1,15 +1,15 @@
 #!/bin/bash
 # Script robusto para instalar e testar PaddleOCR com fallback automático para paddlepaddle==2.6.2
 # Autor: Atn4s com ajuda da IA 👾
-
+clear
 echo "🚀 Iniciando setup do PaddleOCR (versão compatível com sua máquina)..."
 
 # 1. Instala pacotes necessários
-echo "🔧 Instalando pacotes de sistema..."
+echo "🔧 Instalando pacotes de sistema [python3.12-venv e libgomp1]"
 sudo apt update && sudo apt install -y python3.12-venv libgomp1
 
 # 2. Cria e ativa ambiente virtual
-echo "🐍 Criando ambiente virtual 'PaddleOCR'..."
+echo "🐍 Criando ambiente virtual 'PaddleOCR' na pasta atual"
 python3.12 -m venv PaddleOCR
 source PaddleOCR/bin/activate
 
@@ -56,5 +56,15 @@ echo "🔧 Movendo diretórios para dentro do PaddleOCR e instalando o restante 
     mv PaddleGUI.py PaddleOCR/   
     pip install -r requirements.txt        
     mv requirements.txt PaddleOCR/
+    mv processa_imagens.sh PaddleOCR/
+    cd PaddleOCR/ 
+    mkdir OCRDatabase
+    mkdir Resultados_OCR
+    echo "📂 Diretórios criados: OCRDatabase e Resultados_OCR."
 
 echo "🏁 Setup finalizado. Pronto para extrair textos como um ninja OCR! 🥷📄"
+echo "MAS ATENÇÃO! Todos os arquivos estão no diretório PaddleOCR!"
+echo "Para iniciar o processo de OCR de forma automatica:"
+echo "1: adicione suas imagens ao diretório OCRDatabase."
+echo "2: execute o script processa_imagens.sh dentro do diretório PaddleOCR."
+echo "3: Os resultados serão salvos no diretório Resultados_OCR e um processamento para uma saida JSON (em testes ainda) é salvo em Saida_Processada."
