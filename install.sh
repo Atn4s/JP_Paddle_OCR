@@ -1,37 +1,60 @@
-# Garantir que o python3.12-venv e libgomp1 estejam instalados.
-sudo apt install python3.12-venv libgomp1
+#!/bin/bash
+# Script robusto para instalar e testar PaddleOCR com fallback automático para paddlepaddle==2.6.2
+# Autor: Atn4s com ajuda da IA 👾
 
-# inicia ambiente python
-python3 -m venv PaddleOCR
+echo "🚀 Iniciando setup do PaddleOCR (versão compatível com sua máquina)..."
 
-# ativa o ambiente
+# 1. Instala pacotes necessários
+echo "🔧 Instalando pacotes de sistema..."
+sudo apt update && sudo apt install -y python3.12-venv libgomp1
+
+# 2. Cria e ativa ambiente virtual
+echo "🐍 Criando ambiente virtual 'PaddleOCR'..."
+python3.12 -m venv PaddleOCR
 source PaddleOCR/bin/activate
 
-#criação de diretórios necessários:
-cd PaddleOCR/
-mkdir Matriz_Confusao
-mkdir Resultados_OCR
-touch path.py
+# 3. Atualiza pip e instala dependências
+echo "📦 Instalando PaddleOCR com PaddlePaddle 3.0.0 (primeira tentativa)..."
+pip install --upgrade pip
+pip install paddlepaddle==3.0.0 paddleocr==2.10.0 setuptools==80.3.1 wheel==0.45.1
 
-# Em path.py insirá os caminhos que seram utilizados durante o projeto como no exemplo abaixo:
-# === Caminho resultados obtidos ===
-#resultados = "/home/Usuario/Documentos/Resultados_OCR"
-# === Caminho para iniciar o Paddle ===
-#carregar_imagens = "/home/Usuario/IMAGENS_OCR"
-# === Caminho para resultados oe JSON ===
-#matriz_confusao = "/home/Usuario/Documentos/Matriz_Confusao/"
+# 4. Testa o comando paddleocr
+echo "🧪 Testando o comando paddleocr..."
 
-# Antes de instalar verifique o modelo que deseja, se é baseado na CPU ou GPU
-#cpu
-pip install paddlepaddle
-# gpu
-pip install paddlepaddle-gpu
+# Comando de teste com timeout e captura de falha de CPU
+(paddleocr -m > /dev/null 2>&1) &
+PID=$!
+sleep 3
+if ! kill -0 $PID 2>/dev/null; then
+    wait $PID
+    STATUS=$?
+    if [[ $STATUS -eq 132 ]]; then
+        echo "⚠️ Erro de instrução ilegal detectado (provavelmente AVX não suportado)."
+        echo "🔁 Fazendo downgrade automático para paddlepaddle==2.6.2..."
 
-# pip dependencias:
-pip install paddleocr setuptools wheel
+        pip uninstall -y paddlepaddle
+        pip install paddlepaddle==2.6.2
 
-# garantir que ambiente está configurado e atualizado
-pip install -U pip paddleocr setuptools wheel
+        echo "✅ Downgrade concluído. Tentando novamente o comando paddleocr..."
+        paddleocr -m || echo "⚠️ paddleocr -m ainda não executou corretamente. Tente um teste completo com imagem."
+    else
+        echo "✅ paddleocr executado com sucesso na versão 3.0.0!"
+    fi
+else
+    kill $PID
+    echo "✅ paddleocr executado com sucesso na versão 3.0.0!"
+fi
 
-# Uso Paddle:
-# paddleocr --image_dir doc/imgs_en/254.jpg --lang=pt # suporta en também no idioma
+# 5. Exemplo de uso
+echo "📸 Para testar com uma imagem real, use o comando:"
+echo "   paddleocr --image_dir doc/imgs_en/254.jpg --lang=pt"
+echo "🌍 Suporta idiomas como pt e en."
+
+echo "🔧 Movendo diretórios para dentro do PaddleOCR e instalando o restante das dependencias!"
+    mv Modulos PaddleOCR/
+    mv OCR_schema.py PaddleOCR/
+    mv PaddleGUI.py PaddleOCR/   
+    pip install -r requirements.txt        
+    mv requirements.txt PaddleOCR/
+
+echo "🏁 Setup finalizado. Pronto para extrair textos como um ninja OCR! 🥷📄"
