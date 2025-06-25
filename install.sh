@@ -62,6 +62,7 @@ echo "🔧 Movendo diretórios para dentro do PaddleOCR e instalando o restante 
     mkdir Resultados_OCR
     echo "📂 Diretórios criados: OCRDatabase e Resultados_OCR."
 
+clear
 echo "🏁 Setup finalizado. Pronto para extrair textos como um ninja OCR! 🥷📄"
 echo "MAS ATENÇÃO! Todos os arquivos estão no diretório PaddleOCR!"
 echo "Para iniciar o processo de OCR de forma automatica:"
