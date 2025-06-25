@@ -87,6 +87,7 @@ python PaddleGUI.py
 Isso abrirá uma interface com o EasyGUI para você selecionar uma imagem e processá-la individualmente.
 📁 Estrutura dos arquivos
 
+```
 PaddleGUI.py              # Script principal do OCR + visualização
 OCR_schema.py             # Gera JSON estruturado a partir dos resultados
 Modulos/
@@ -95,7 +96,7 @@ Modulos/
 └── path.py               # Manipulação de diretórios e caminhos
 OCRDatabase/              # Pasta onde você coloca suas imagens
 saida_processada/         # Resultados processados em .json
-
-📌 Observações finais
+```
+##  📌 Observações finais
 
     O projeto ainda está em desenvolvimento — fique à vontade para sugerir melhorias!
