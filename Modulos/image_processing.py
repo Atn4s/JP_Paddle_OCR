@@ -103,4 +103,4 @@ def process_image(img_path):
     plt.axis("off")
     plt.title(f"OCR: {img_name}")
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)  # Preenche toda a figura
-    plt.show()
+    #plt.show()
