@@ -1,4 +1,5 @@
 #!/bin/bash
+source bin/activate
 
 # Diretório onde estão as imagens
 DIRETORIO_IMAGENS="./OCRDatabase"

@@ -7,4 +7,4 @@ pyvenv.cfg
 __pycache__
 OCRDatabase/*
 Resultados_OCR/*
-/saida_processada
+/Saida_Processada
