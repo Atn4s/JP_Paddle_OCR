@@ -42,7 +42,7 @@ Esse script:
 
 Coloque as imagens que deseja processar na pasta:
 
-OCRDatabase/
+images/
 
 ## 2. Execução
    
@@ -55,7 +55,7 @@ Este comando irá:
 
     Executar PaddleGUI.py dentro do ambiente virtual
 
-    Processar todas as imagens em OCRDatabase
+    Processar todas as imagens em images
 
     Salvar para cada imagem:
 
@@ -94,7 +94,7 @@ Modulos/
 ├── config.py             # Configurações gerais (OCR, fonte, validações)
 ├── image_processing.py   # Lógica de plotagem com Matplotlib
 └── path.py               # Manipulação de diretórios e caminhos
-OCRDatabase/              # Pasta onde você coloca suas imagens
+images/                   # Pasta onde você coloca suas imagens
 saida_processada/         # Resultados processados em .json
 ```
 ##  📌 Observações finais

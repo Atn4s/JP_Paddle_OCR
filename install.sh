@@ -9,11 +9,13 @@ echo "🔧 Instalando pacotes de sistema [python3.12-venv e libgomp1]"
 sudo apt update && sudo apt install -y python3.12-venv libgomp1
 
 # 2. Cria e ativa ambiente virtual
+clear
 echo "🐍 Criando ambiente virtual 'PaddleOCR' na pasta atual"
 python3.12 -m venv PaddleOCR
 source PaddleOCR/bin/activate
 
 # 3. Atualiza pip e instala dependências
+clear
 echo "📦 Instalando PaddleOCR com PaddlePaddle 3.0.0 (primeira tentativa)..."
 pip install --upgrade pip
 pip install paddlepaddle==3.0.0 paddleocr==2.10.0 setuptools==80.3.1 wheel==0.45.1
@@ -45,11 +47,8 @@ else
     echo "✅ paddleocr executado com sucesso na versão 3.0.0!"
 fi
 
-# 5. Exemplo de uso
-echo "📸 Para testar com uma imagem real, use o comando:"
-echo "   paddleocr --image_dir doc/imgs_en/254.jpg --lang=pt"
-echo "🌍 Suporta idiomas como pt e en."
-
+# 5. Finalização de diretórios e instalação de dependências adicionais
+clear
 echo "🔧 Movendo diretórios para dentro do PaddleOCR e instalando o restante das dependencias!"
     mv Modulos PaddleOCR/
     mv OCR_schema.py PaddleOCR/
@@ -58,14 +57,9 @@ echo "🔧 Movendo diretórios para dentro do PaddleOCR e instalando o restante 
     mv requirements.txt PaddleOCR/
     mv processa_imagens.sh PaddleOCR/
     cd PaddleOCR/ 
-    mkdir OCRDatabase
+    mkdir images
     mkdir Resultados_OCR
-    echo "📂 Diretórios criados: OCRDatabase e Resultados_OCR."
+    echo "📂 Diretórios criados: images e Resultados_OCR."
 
 clear
-echo "🏁 Setup finalizado. Pronto para extrair textos como um ninja OCR! 🥷📄"
-echo "MAS ATENÇÃO! Todos os arquivos estão no diretório PaddleOCR!"
-echo "Para iniciar o processo de OCR de forma automatica:"
-echo "1: adicione suas imagens ao diretório OCRDatabase."
-echo "2: execute o script processa_imagens.sh dentro do diretório PaddleOCR."
-echo "3: Os resultados serão salvos no diretório Resultados_OCR e um processamento para uma saida JSON (em testes ainda) é salvo em Saida_Processada."
+echo "🏁 Setup do PaddleOCR foi finalizado. 

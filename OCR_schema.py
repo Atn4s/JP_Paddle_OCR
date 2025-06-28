@@ -5,41 +5,44 @@ from datetime import datetime
 from typing import List, Dict, Optional, Any
 import argparse
 
+# OBSERVAÇÃO: O MÉTODO AINDA NÃO ESTÁ COMPLETO! AINDA APRESENTA ALGUNS ERROS DE VALIDAÇÃO E EXTRAÇÃO
+
+#classe OCRProcessor responsável por processar os arquivos de OCR em formato .txt para uma saída em formato JSON estruturado 
 class OCRProcessor:
     def __init__(self):
         self.output_dir = "Saida_Processada"
         self.ensure_output_dir()
         
-    def ensure_output_dir(self):
-        """Cria o diretório de saída se não existir"""
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+    def ensure_output_dir(self):                # Função para garantir que o diretório de saída exista
+        if not os.path.exists(self.output_dir): # Cria o diretório de saída se não existir
+            os.makedirs(self.output_dir)        
     
-    def parse_ocr_line(self, line: str) -> Dict[str, Any]:
-        """Extrai informações de uma linha do OCR"""
-        # Padrão para extrair OCR='texto', score=valor, bbox=[coordenadas]
+    def parse_ocr_line(self, line: str) -> Dict[str, Any]: # Função para extrair informações de uma linha do OCR montando um dicionário com as informações extraidas 
+        # Extrai informações de uma linha do OCR, por padrão é OCR='texto', score=valor, bbox=[coordenadas] como definido em image_processing.py
         pattern = r"OCR='([^']*)',\s*score=([0-9.]+),\s*bbox=\[([0-9,\s]+)\]"
         match = re.match(pattern, line.strip())
         
+        # Se a linha corresponder ao padrão o texto é extraido 
         if match:
-            text = match.group(1)
-            score = float(match.group(2))
-            bbox_coords = [int(x.strip()) for x in match.group(3).split(',')]
+            text = match.group(1)             # texto identificado pelo OCR
+            score = float(match.group(2))     # score de confiança do Paddle   
+            bbox_coords = [int(x.strip()) for x in match.group(3).split(',')] # coordenadas do bouding box 
             return {
-                'text': text,
-                'score': score,
-                'bbox': bbox_coords,
+                'text': text,                 # Texto identificado pelo OCR 
+                'score': score,               # Score de confiança do PaddleOCR 
+                'bbox': bbox_coords,          # Coordenadas do bouding box
                 'y_position': bbox_coords[1]  # Posição Y para ordenação
             }
         return None
     
     def extract_cnpj(self, ocr_data: List[Dict]) -> Optional[str]:
-        """Extrai CNPJ do texto OCR"""
+        # Extrai CNPJ do texto OCR por enquanto são considerados 2 modelos, um correto e outro incorreto para validar
         cnpj_patterns = [
             r'(?:CNPJ?[:\s]*)?(\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2})',
             r'(?:CHP\.J[:\s]*)?(\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2})'
         ]
         
+        # Percorre os dados OCR e tenta encontrar um CNPJ que corresponda aos padrões acima
         for item in ocr_data:
             text = item['text']
             for pattern in cnpj_patterns:
@@ -51,14 +54,14 @@ class OCRProcessor:
         return None
     
     def extract_date(self, ocr_data: List[Dict]) -> Optional[str]:
-        """Extrai data de emissão"""
+        # Extrai data de emissão utilizando padrões comuns de data DD/MM/YYYY, DD-MM-YYYY, YYYY/MM/DD, YYYY-MM-DD
         date_patterns = [
             r'(\d{2}[-/]\d{2}[-/]\d{4})',
             r'(\d{2}[-/]\d{2}[-/]\d{2})',
             r'(\d{4}[-/]\d{2}[-/]\d{2})'
         ]
         
-        for item in ocr_data:
+        for item in ocr_data: # Percorre os dados OCR e tenta encontrar uma data que corresponda aos padrões acima
             text = item['text']
             for pattern in date_patterns:
                 match = re.search(pattern, text)
@@ -78,8 +81,7 @@ class OCRProcessor:
         return None
     
     def extract_establishment_name(self, ocr_data: List[Dict]) -> Optional[str]:
-        """Extrai nome do estabelecimento"""
-        # Procura por textos que parecem ser nomes de estabelecimentos
+        # Extrai nome do estabelecimentoe e procura por textos que parecem ser nomes de estabelecimentos
         for item in ocr_data:
             text = item['text'].strip()
             # Verifica se contém palavras indicativas de estabelecimento
@@ -91,13 +93,11 @@ class OCRProcessor:
         return None
     
     def is_product_code(self, text: str) -> bool:
-        """Verifica se o texto parece ser um código de produto"""
-        # Códigos de barras geralmente têm 13 dígitos
+        # Verifica se o texto parece ser um código de produto, Códigos de barras geralmente têm 13 dígitos e podem conter espaços
         return bool(re.match(r'^\d{13}$', text.replace(' ', '')))
     
     def extract_price(self, text: str) -> Optional[float]:
-        """Extrai preço de um texto"""
-        # Padrões para preços brasileiros
+        # Extrai preço de um texto padrões para preços brasileiros como R$ 12,34 ou R$ 12.34
         price_patterns = [
             r'(\d+[,.]\d{2})',
             r'(\d+,\d{2})',
@@ -115,8 +115,7 @@ class OCRProcessor:
         return None
     
     def extract_quantity(self, text: str) -> Optional[float]:
-        """Extrai quantidade de um texto"""
-        # Padrões para quantidades
+        # Extrai quantidade de um texto Padrões para quantidades como 1, 2.5 kg, 3 un, etc...
         qty_patterns = [
             r'(\d+[,.]\d+)\s*kg',
             r'(\d+[,.]\d+)\s*Kg',
@@ -124,7 +123,7 @@ class OCRProcessor:
             r'(\d+)\s*Un'
         ]
         
-        for pattern in qty_patterns:
+        for pattern in qty_patterns: # Percorre os padrões de quantidade e tenta encontrar uma correspondência
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
                 qty_str = match.group(1).replace(',', '.')
@@ -140,7 +139,8 @@ class OCRProcessor:
         return None
     
     def extract_items(self, ocr_data: List[Dict]) -> List[Dict]:
-        """Extrai itens da nota fiscal"""
+        # Extrai itens da nota fiscal e estrutura em uma lista de dicionários
+        # Cada item deve conter: número, código, descrição, quantidade, preço unitário,
         items = []
         current_item = {}
         item_number = 1
@@ -259,14 +259,14 @@ class OCRProcessor:
         return result
     
     def save_json(self, data: Dict[str, Any], output_filename: str):
-        """Salva dados em arquivo JSON"""
+        # Salva dados em arquivo JSON
         output_path = os.path.join(self.output_dir, output_filename)
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print(f"Arquivo salvo: {output_path}")
     
     def process_file(self, input_file: str, output_file: str = None):
-        """Processa um arquivo de OCR"""
+        # Processa um arquivo de OCR de entrada e salva o resultado em JSON
         try:
             print(f"Processando arquivo: {input_file}")
             data = self.process_ocr_file(input_file)
@@ -281,6 +281,7 @@ class OCRProcessor:
         except Exception as e:
             print(f"Erro ao processar arquivo: {e}")
 
+# A função principal é responsável por configurar um parser de argumentos para entrada e saída 
 def main():
     parser = argparse.ArgumentParser(description='Processa todos os arquivos .txt da pasta Resultados_OCR')
     parser.add_argument('-i', '--input_dir', default='Resultados_OCR', help='Diretório de entrada com arquivos .txt')
@@ -290,10 +291,10 @@ def main():
     
     input_dir = args.input_dir
     output_dir = args.output_dir
-    
-    processor = OCRProcessor()
-    processor.output_dir = output_dir  # Garante que use o output informado
-    processor.ensure_output_dir()
+                                    
+    processor = OCRProcessor()         # A classe OCRProcessor é instanciada para processar os arquivos de OCR em formato .txt
+    processor.output_dir = output_dir  # Garante que use o output dir especificado pelo usuário ou o padrão foram definidos
+    processor.ensure_output_dir()      # Garante que o diretório de saída exista
     
     # Itera por todos os arquivos .txt no diretório
     for filename in os.listdir(input_dir):
