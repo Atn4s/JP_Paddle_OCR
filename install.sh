@@ -62,4 +62,4 @@ echo "🔧 Movendo diretórios para dentro do PaddleOCR e instalando o restante 
     echo "📂 Diretórios criados: images e Resultados_OCR."
 
 clear
-echo "🏁 Setup do PaddleOCR foi finalizado. 
+echo "🏁 Setup do PaddleOCR foi finalizado."
